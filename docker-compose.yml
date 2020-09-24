@@ -1,0 +1,45 @@
+version: '3'
+services:
+  pg_db:
+    image: postgres:12-alpine
+    container_name: pg_db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "5432:5432"
+    env_file:
+      - postgres.env
+    volumes:
+      - pg_db_data:/var/lib/postgresql/data
+      - ./pg_database/:/pg_database/
+    networks:
+      - pg-network
+
+
+  # To only use when need to debug database visually.
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@example.com
+      PGADMIN_DEFAULT_PASSWORD: SOME_PASSWORD4
+    volumes:
+        - pgadmin:/root/.pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - pg-network
+    restart: unless-stopped
+
+#Docker Networks
+networks:
+  pg-network:
+    driver: bridge
+
+    
+#Docker Volumes
+volumes:
+  pg_db_data:
+    driver: local
+  pgadmin:
+    driver: local
